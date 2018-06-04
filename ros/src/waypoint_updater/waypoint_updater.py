@@ -131,7 +131,10 @@ class WaypointUpdater(object):
 
     def traffic_cb(self, msg):
         # TODO: Callback for /traffic_waypoint message. Implement
-        self.tl_waypoint_idx = msg.data - 200 #to stop before the traffic light
+		if(msg.data < 50):
+		    self.tl_waypoint_idx = -1
+		else:
+        self.tl_waypoint_idx = msg.data - 50 #to stop before the traffic light
 
     def obstacle_cb(self, msg):
         # TODO: Callback for /obstacle_waypoint message. We will implement it later
