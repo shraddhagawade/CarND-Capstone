@@ -24,6 +24,7 @@ class Controller(object):
         
         self.last_velocity = None
         self.last_time = rospy.get_time()
+        self.decel_limit = decel_limit
         
     def control(self, current_velocity, dbw_enabled, linear_velocity, angular_velocity):
         # TODO: Change the arg, kwarg list to suit your needs
@@ -52,9 +53,9 @@ class Controller(object):
             throttle = 0
             brake = 700
             
-        elif throttle < 0.1 and vel_error < 0:
+        elif throttle < 0.1 and velocity_error < 0:
             throttle = 0
-            decel = max(vel_error, self.decel_limit)
+            decel = max(velocity_error, self.decel_limit)
             brake = abs(decel)*self.vehicle_mass*self.wheel_radius
         
         return throttle, brake, steering

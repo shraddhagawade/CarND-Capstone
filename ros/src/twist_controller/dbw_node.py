@@ -97,7 +97,7 @@ class DBWNode(object):
             rate.sleep()
             
     def velocity_cb(self, velocity):
-        self.current_velocity = velocity
+        self.current_velocity = velocity.twist.linear.x
     
     def twist_cb(self, twist):
         self.linear_velocity = twist.twist.linear.x
