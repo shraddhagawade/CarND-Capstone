@@ -92,6 +92,7 @@ class DBWNode(object):
                 self.throttle, self.brake, self.steering = self.controller.control(self.current_velocity, self.dbw_enabled, 
                                                                         self.linear_velocity, self.angular_velocity)
             if self.dbw_enabled:
+                rospy.logdebug('Throttle:%s, Brake:%s, Steering:%s',self.throttle, self.brake, self.steering)
                 self.publish(self.throttle, self.brake, self.steering)
                 
             rate.sleep()
