@@ -25,6 +25,8 @@ class Controller(object):
         self.last_velocity = None
         self.last_time = rospy.get_time()
         self.decel_limit = decel_limit
+        self.vehicle_mass = vehicle_mass
+        self.wheel_radius = wheel_radius
         
     def control(self, current_velocity, dbw_enabled, linear_velocity, angular_velocity):
         # TODO: Change the arg, kwarg list to suit your needs

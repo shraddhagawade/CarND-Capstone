@@ -84,14 +84,13 @@ class WaypointUpdater(object):
         # lane.waypoints = self.base_waypoints.waypoints[closest_waypoint_idx:closest_waypoint_idx+LOOKAHEAD_WPS]
         lane = self.generate_lane()
         self.final_waypoints_pub.publish(lane)
-        rospy.loginfo('Publishing Waypoints')
         
     def generate_lane(self):
         lane = Lane()
         lane.header = self.base_waypoints.header
         
         closest_waypoint_idx = self.get_closest_waypoint_idx()
-        last_idx = closest_idx + LOOKAHEAD_WPS
+        last_idx = closest_waypoint_idx + LOOKAHEAD_WPS
         next_waypoints = self.base_waypoints.waypoints[closest_waypoint_idx:last_idx]
         
         if (self.tl_waypoint_idx == -1) or (self.tl_waypoint_idx >= last_idx):
@@ -121,12 +120,10 @@ class WaypointUpdater(object):
 
     def pose_cb(self, msg):
         # TODO: Implement
-        rospy.loginfo('Received pose')
         self.pose = msg
 
     def waypoints_cb(self, waypoints):
         # TODO: Implement
-        rospy.loginfo('Received base_waypoints')
         self.base_waypoints = waypoints
         if not self.waypoints_2d:
             self.waypoints_2d = [[waypoint.pose.pose.position.x,waypoint.pose.pose.position.y] for waypoint in waypoints.waypoints]
@@ -134,7 +131,6 @@ class WaypointUpdater(object):
 
     def traffic_cb(self, msg):
         # TODO: Callback for /traffic_waypoint message. Implement
-        rospy.loginfo('Received Traffic light waypoint index')
         self.tl_waypoint_idx = msg.data
 
     def obstacle_cb(self, msg):
