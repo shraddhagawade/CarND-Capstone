@@ -86,7 +86,7 @@ class WaypointUpdater(object):
         self.final_waypoints_pub.publish(lane)
         rospy.loginfo('Publishing Waypoints')
         
-    def generate_lane():
+    def generate_lane(self):
         lane = Lane()
         lane.header = self.base_waypoints.header
         
