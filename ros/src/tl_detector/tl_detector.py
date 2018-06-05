@@ -13,6 +13,7 @@ import yaml
 from scipy.spatial import KDTree
 
 STATE_COUNT_THRESHOLD = 3
+FRAME_COUNT = 3
 
 class TLDetector(object):
     def __init__(self):
@@ -22,6 +23,9 @@ class TLDetector(object):
         self.waypoints = None
         self.camera_image = None
         self.lights = []
+        self.waypoints_2d = None
+        self.waypoint_tree = None
+        self.number_frames = 4
 
         sub1 = rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
         sub2 = rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
@@ -50,9 +54,6 @@ class TLDetector(object):
         self.last_wp = -1
         self.state_count = 0
         
-        self.waypoints_2d = None
-        self.waypoint_tree = None
-
         rospy.spin()
 
     def pose_cb(self, msg):
@@ -75,6 +76,11 @@ class TLDetector(object):
             msg (Image): image from car-mounted camera
 
         """
+        if(self.number_frames<FRAME_COUNT):
+            self.number_frames+=1
+            return
+        else:
+            self.number_frames=0
         self.has_image = True
         self.camera_image = msg
         light_wp, state = self.process_traffic_lights()
@@ -127,7 +133,9 @@ class TLDetector(object):
         cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
 
         #Get classification
-        return self.light_classifier.get_classification(cv_image)
+        out = self.light_classifier.get_classification(cv_image)
+        print(out)
+        return out
         # return light.state
 
     def process_traffic_lights(self):
