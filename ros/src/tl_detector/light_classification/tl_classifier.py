@@ -27,7 +27,6 @@ class TLClassifier(object):
         upper_red = np.array([50,255,255])
         mask0 = cv2.inRange(img_hsv, lower_red, upper_red)
         count = np.count_nonzero(mask0)
-        print count
         
         if(count>=200):
             return TrafficLight.RED
