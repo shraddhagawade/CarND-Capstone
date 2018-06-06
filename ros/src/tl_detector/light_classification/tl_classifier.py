@@ -1,20 +1,31 @@
 from styx_msgs.msg import TrafficLight
+import tensorflow as tf
+import rospy
+import cv2
+import numpy as np
 
 class TLClassifier(object):
     def __init__(self):
         #TODO load classifier
         tf.reset_default_graph()
-        self.sess = tf.Session()
         
-        saver = tf.train.import_meta_graph('model.ckpt.meta')
-        saver.restore(sess,tf.train.latest_checkpoint('./'))
-            
-        rospy.loginfo('Model Restored')
+        frozen_graph="./light_classification/model.pb"
+        with tf.gfile.GFile(frozen_graph, "rb") as f:
+            restored_graph_def = tf.GraphDef()
+            restored_graph_def.ParseFromString(f.read())
+        with tf.Graph().as_default() as graph:
+            tf.import_graph_def(
+            restored_graph_def,
+            input_map=None,
+            return_elements=None,
+            name=""
+        )
+        self.graph = graph
+        self.sess = tf.Session(graph=graph)
         
-        self.graph = tf.get_default_graph()
-        self.prediction = graph.get_tensor_by_name("prediction")
-        self.input = graph.get_tensor_by_name("input")        
-        self.keep_prob = graph.get_tensor_by_name("keep_prob")
+        self.prediction = self.graph.get_tensor_by_name("prediction:0")
+        self.input = self.graph.get_tensor_by_name("input:0")        
+        self.keep_prob = self.graph.get_tensor_by_name("keep_prob:0")
 
     def get_classification(self, image):
         """Determines the color of the traffic light in the image
@@ -27,7 +38,18 @@ class TLClassifier(object):
 
         """
         #TODO implement light color prediction
-        pred = self.sess.run(self.prediction, feed_dict={self.input:image, self.keep_prob:1.}
-        labels = [TrafficLight.GREEN,TrafficLight.UNKNOWN,TrafficLight.RED,TrafficLight.YELLOW]
+        import numpy as np
+        img_hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+
+        lower_red = np.array([0,140,120])
+        upper_red = np.array([50,255,255])
+        mask0 = cv2.inRange(img_hsv, lower_red, upper_red)
+        count = np.count_nonzero(mask0)
+        print count
         
-        return labels[pred]
+        if(count>=200):
+            print 'RED'
+            return TrafficLight.RED
+        else:
+            print 'GO'
+            return TrafficLight.UNKNOWN

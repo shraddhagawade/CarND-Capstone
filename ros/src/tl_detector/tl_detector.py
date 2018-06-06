@@ -13,7 +13,6 @@ import yaml
 from scipy.spatial import KDTree
 
 STATE_COUNT_THRESHOLD = 3
-FRAME_COUNT = 3
 
 class TLDetector(object):
     def __init__(self):
@@ -25,7 +24,6 @@ class TLDetector(object):
         self.lights = []
         self.waypoints_2d = None
         self.waypoint_tree = None
-        self.number_frames = 4
 
         sub1 = rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
         sub2 = rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
@@ -76,11 +74,7 @@ class TLDetector(object):
             msg (Image): image from car-mounted camera
 
         """
-        if(self.number_frames<FRAME_COUNT):
-            self.number_frames+=1
-            return
-        else:
-            self.number_frames=0
+        
         self.has_image = True
         self.camera_image = msg
         light_wp, state = self.process_traffic_lights()
@@ -134,9 +128,8 @@ class TLDetector(object):
 
         #Get classification
         out = self.light_classifier.get_classification(cv_image)
-        print(out)
         return out
-        # return light.state
+#         return light.state
 
     def process_traffic_lights(self):
         """Finds closest visible traffic light, if one exists, and determines its
