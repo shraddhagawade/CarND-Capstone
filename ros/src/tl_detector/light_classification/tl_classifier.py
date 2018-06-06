@@ -30,8 +30,6 @@ class TLClassifier(object):
         print count
         
         if(count>=200):
-            print 'RED'
             return TrafficLight.RED
         else:
-            print 'GO'
             return TrafficLight.UNKNOWN
